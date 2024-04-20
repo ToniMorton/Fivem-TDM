@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+    <title>Team Deathmatch</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background-color: #16161D;
+            overflow: hidden;
+        }
+
+        .container {
+            width: 70%; 
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background-color: #7b7b86;
+            color: white;
+            border-radius: 8px;
+            border: black 2px solid;
+            margin-bottom: 100px;
+            margin-top: 10px;
+        }
+
+        .team-container {
+            width: 80%; 
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .team-btnr {
+            margin: 0 100px;
+            padding: 150px 150px;
+            font-size: 40px;
+            border-radius: 5px;
+            background-color: rgb(163, 20, 20);
+            color:white;
+            border-color: #16161D;
+        }
+        .team-btnb {
+            margin: 0 100px;
+            padding: 150px 150px;
+            font-size: 40px;
+            border-radius: 5px;
+            background-color: rgb(40, 40, 214);
+            color:white;
+            border-color: #16161D;
+        }
+        .teamr-img {
+            position: relative;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            border-radius: 8px;
+            width: 300px;
+            height: 300px;
+            object-fit: contain;
+        }
+        .teamb-img {
+            position: relative;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            border-radius: 8px;
+            width: 300px;
+            height: 300px;
+            object-fit: contain;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Team Selection</h1>
+        <h3>Choose your team</h3>
+    </div>
+
+    <div class="team-container">
+        <button class="btn btn-primary team-btnb"><img class="teamb-img" src="img/1.png" alt="Blue Team Logo" width="100" height="100"></br>SA Defense Forces</button>
+        <button class="btn btn-primary team-btnr"><img class="teamr-img" src="img/2.png" alt="Red Team Logo" width="100" height="100"></br>Para-military Forces</button>
+    </div>
+    <script>
+        ShowingUI = false;
+        const teamRed = document.querySelector('.team-btnr');
+        const teamBlue = document.querySelector('.team-btnb'); 
+        //on hover make the border glow white and add a shadow
+        teamRed.addEventListener('mouseover', () => {
+            teamRed.style.borderColor = 'white';
+            teamRed.style.boxShadow = '0 0 10px white';
+        });
+        teamRed.addEventListener('mouseout', () => {
+            teamRed.style.borderColor = '#16161D';
+            teamRed.style.boxShadow = 'none';
+        });
+        teamBlue.addEventListener('mouseover', () => {
+            teamBlue.style.borderColor = 'white';
+            teamBlue.style.boxShadow = '0 0 10px white';
+        });
+        teamBlue.addEventListener('mouseout', () => {
+            teamBlue.style.borderColor = '#16161D';
+            teamBlue.style.boxShadow = 'none';
+        });
+
+        //make the shadow and border glow green and pop out a bit more than usual on click
+        teamRed.addEventListener('click', () => {
+            teamRed.style.borderColor = 'yellow';
+            teamRed.style.boxShadow = '0 0 15px yellow';
+        });
+
+        teamBlue.addEventListener('click', () => {
+            teamBlue.style.borderColor = 'yellow';
+            teamBlue.style.boxShadow = '0 0 15px yellow';
+        });
+
+        // using jquery send a message to the callback script so the NUI can set the target team
+        teamRed.addEventListener('click', () => {
+        fetch(`https://${GetParentResourceName()}/SetTeam`, {
+            method: 'POST',
+            headers: {
+            'Content-Type': 'application/json; charset=UTF-8',
+            },
+                body: JSON.stringify({
+                team: 'Red'
+            })
+            }).then(resp => resp.json()).then(resp => console.log(resp));
+            //$.post('https://basic-gamemode/SetTeam', JSON.stringify({team: 'Red'}));
+            $('body').hide();
+            ShowingUI = false;
+        });
+
+        teamBlue.addEventListener('click', () => {
+            fetch(`https://${GetParentResourceName()}/SetTeam`, {
+            method: 'POST',
+            headers: {
+            'Content-Type': 'application/json; charset=UTF-8',
+            },
+                body: JSON.stringify({
+                team: 'Blue'
+            })
+            }).then(resp => resp.json()).then(resp => console.log(resp));
+            //$.post('https:/basic-gamemode/SetTeam', JSON.stringify({team: 'Blue'}));
+            $('body').hide();
+            ShowingUI = false;
+        });
+
+        //add message listener so the nui can open and close on command
+        window.addEventListener('message', (event) => {
+            if (event.data.type === 'opents') {
+                if (!ShowingUI) {
+                    $('body').show();
+                    ShowingUI = true;
+                } else {
+                    $('body').hide();
+                    ShowingUI = false;
+                }
+            } else if (event.data.type === 'closets') {
+                if (ShowingUI) {
+                    $('body').hide();
+                    ShowingUI = false;
+                }
+            }
+        });
+
+    </script>
+</body>
+</html>
